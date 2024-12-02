@@ -101,6 +101,31 @@ for i = 1:length(fluxo_simbolos)
     
     % Append the binary code to fluxo_bin
     fluxo_bin = [fluxo_bin, binary_code];
+%%% Exercício 2.21 %%%-----------------------------------------------------
+
+R_cod_med = n_fluxo_bin / info.Duration;
+disp('Débito Binário Codificado Médio:');
+disp(R_cod_med);
+
+%%% Exercício 2.22 %%%-----------------------------------------------------
+
+% fluxo_simbolo_descod = zeros(length(fluxo_bin),1);
+% 
+% for i = 1:length(fluxo_bin)
+%     idx_table = find(fluxo_bin(i) == table2array(tabela_final(:,4)));
+%     fluxo_simbolo_descod(i) = simbs_amplitude(table2array(tabela_final(idx_table,1)));
+% end
+%2.23
+t = linspace(0,1,fs);
+plot(t,fluxo_simbolo_descod(1:fs));
+hold on
+plot(t,fluxo_simbolos(1:fs));
+grid on
+xlabel('t[s]');
+ylabel('amplitude');
+legend('fluxo simbolos descod','fluxo simbolos');
+
+
 end
 
 % Display the results
