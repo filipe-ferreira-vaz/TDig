@@ -90,17 +90,26 @@ Eficiencia = Entropia/L_med;
 
 %%% Exercício 2.19 %%%-----------------------------------------------------
 
-fluxo_bin = [];
+fluxo_bin = strings(length(fluxo_simbolos), 1);
 
+% Generate the binary flux
 for i = 1:length(fluxo_simbolos)
     % Find the row in tabela_final corresponding to the current symbol
     row_idx = find([tabela_final{:, 1}] == fluxo_simbolos(i));
     
-    % Extract the binary code from the 4th column and convert it to a numeric vector
-    binary_code = char(tabela_final{row_idx, 4}) - '0'; % Convert string "00" to [0 0]
+    % Extract the binary code from the 4th column
+    binary_code = tabela_final{row_idx, 4}; % Already a string
     
-    % Append the binary code to fluxo_bin
-    fluxo_bin = [fluxo_bin, binary_code];
+    % Assign the codeword to the corresponding row in fluxo_bin
+    fluxo_bin(i) = binary_code;
+end
+
+% Display the results
+disp('Flux of symbols:');
+disp(fluxo_simbolos);
+disp('Binary flux as a column vector of codewords:');
+disp(fluxo_bin);
+
 %%% Exercício 2.21 %%%-----------------------------------------------------
 
 R_cod_med = n_fluxo_bin / info.Duration;
@@ -124,12 +133,3 @@ grid on
 xlabel('t[s]');
 ylabel('amplitude');
 legend('fluxo simbolos descod','fluxo simbolos');
-
-
-end
-
-% Display the results
-disp('Flux of symbols:');
-disp(fluxo_simbolos);
-disp('Binary flux as a vector:');
-disp(fluxo_bin);
