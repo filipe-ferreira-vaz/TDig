@@ -1,3 +1,6 @@
+clear;
+clf;
+clc;
 audio_file = "ST_G8_T2.wav";
 
 %%% Exercício 2.5 %%%
@@ -5,7 +8,7 @@ audio_file = "ST_G8_T2.wav";
 [fluxo_simbolos,fs] = audioread(audio_file);
 n_bits = audioinfo(audio_file).BitsPerSample;
 
-%%% Exercício 2.6 %%%
+%%% Exercício 2.6 %%%-----------------------------------------------------
 
 simb = unique(fluxo_simbolos);
 total_symbols = numel(fluxo_simbolos);
@@ -17,7 +20,7 @@ for i = 1:numel(simb)
 end
 
 
-%%% Exercício 2.7 %%%
+%%% Exercício 2.7 %%%-----------------------------------------------------
 
 figure;
 histogram(fluxo_simbolos, 2^n_bits, 'Normalization', 'probability', 'FaceColor', 'g');
@@ -26,7 +29,7 @@ ylabel('Frequência Relativa');
 title('Histograma');
 grid on;
 
-%%% Exercício 2.8 %%%
+%%% Exercício 2.8 %%%-----------------------------------------------------
 
 figure;
 plot(simb,prob_simb);
@@ -35,7 +38,7 @@ ylabel('Probabilidade');
 title('Função de Densidade de Probabilidade');
 grid on;
 
-%%% Exercício 2.9 %%%
+%%% Exercício 2.9 %%%-----------------------------------------------------
 
 % Símbolos menos prováveis
 prob_simb_min = min(prob_simb);
@@ -47,19 +50,61 @@ prob_simb_max = max(prob_simb);
 idx_max = find(prob_simb == prob_simb_max); % Índices de todos os símbolos mais prováveis
 simb_prob_max = simb(idx_max); % Símbolos mais prováveis
 
-%%% Exercício 2.11 %%%
+%%% Exercício 2.11 %%%-----------------------------------------------------
 
 [prob_simb_no_zero, sort_idx] = sort(prob_simb);
 simb_no_zero = simb(sort_idx);
 
-%%% Exercício 2.12 %%%
+%%% Exercício 2.12 %%%-----------------------------------------------------
 
 Entropia = -sum(prob_simb_no_zero .* log2(prob_simb_no_zero));
 Conteudo_Decisao = log2(size(simb,1));
 Redundancia = Conteudo_Decisao - Entropia;
 
-%%% Exercício 2.15 %%%
+%%% Exercício 2.15 %%%-----------------------------------------------------
 
 R = fs*Entropia;
 Rd = fs*Conteudo_Decisao;
 Db_Redund = fs*Redundancia;
+
+%%% Exercício 2.17 %%%-----------------------------------------------------
+
+simb_huff = flip(simb_no_zero);
+prob_simb_huff = flip(prob_simb_no_zero);
+
+[dict, L_med] = huffmandict(simb_huff, prob_simb_huff);
+
+n = numel(simb_huff);
+tabela_final = cell(n, 4);
+
+for i = 1:n
+    tabela_final{i, 1} = simb_huff(i);
+    tabela_final{i, 2} = prob_simb_huff(i);
+    tabela_final{i, 3} = length(dict{i, 2});
+    tabela_final{i, 4} = strjoin(string(dict{i, 2}), '');
+end
+
+%%% Exercício 2.18 %%%-----------------------------------------------------
+
+Eficiencia = Entropia/L_med;
+
+%%% Exercício 2.19 %%%-----------------------------------------------------
+
+fluxo_bin = [];
+
+for i = 1:length(fluxo_simbolos)
+    % Find the row in tabela_final corresponding to the current symbol
+    row_idx = find([tabela_final{:, 1}] == fluxo_simbolos(i));
+    
+    % Extract the binary code from the 4th column and convert it to a numeric vector
+    binary_code = char(tabela_final{row_idx, 4}) - '0'; % Convert string "00" to [0 0]
+    
+    % Append the binary code to fluxo_bin
+    fluxo_bin = [fluxo_bin, binary_code];
+end
+
+% Display the results
+disp('Flux of symbols:');
+disp(fluxo_simbolos);
+disp('Binary flux as a vector:');
+disp(fluxo_bin);
