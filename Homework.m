@@ -22,7 +22,6 @@ end
 
 %%% Exercício 2.7 %%%-----------------------------------------------------
 
-figure;
 histogram(fluxo_simbolos, 2^n_bits, 'Normalization', 'probability', 'FaceColor', 'g');
 xlabel('Símbolos');
 ylabel('Frequência Relativa');
@@ -75,13 +74,14 @@ prob_simb_huff = flip(prob_simb_no_zero);
 [dict, L_med] = huffmandict(simb_huff, prob_simb_huff);
 
 n = numel(simb_huff);
-tabela_final = cell(n, 4);
+
+tabela_final = table('Size', [n, 4], 'VariableTypes', {'double', 'double', 'double', 'string'}, 'VariableNames', {'Symbol', 'Probability', 'NumBits', 'BinaryCode'});
 
 for i = 1:n
-    tabela_final{i, 1} = simb_huff(i);
-    tabela_final{i, 2} = prob_simb_huff(i);
-    tabela_final{i, 3} = length(dict{i, 2});
-    tabela_final{i, 4} = strjoin(string(dict{i, 2}), '');
+    tabela_final.Symbol(i) = simb_huff(i);
+    tabela_final.Probability(i) = prob_simb_huff(i);
+    tabela_final.NumBits(i) = length(dict{i, 2});
+    tabela_final.BinaryCode(i) = strjoin(string(dict{i, 2}), '');
 end
 
 %%% Exercício 2.18 %%%-----------------------------------------------------
@@ -92,44 +92,55 @@ Eficiencia = Entropia/L_med;
 
 fluxo_bin = strings(length(fluxo_simbolos), 1);
 
-% Generate the binary flux
 for i = 1:length(fluxo_simbolos)
-    % Find the row in tabela_final corresponding to the current symbol
     row_idx = find([tabela_final{:, 1}] == fluxo_simbolos(i));
     
-    % Extract the binary code from the 4th column
-    binary_code = tabela_final{row_idx, 4}; % Already a string
-    
-    % Assign the codeword to the corresponding row in fluxo_bin
+    binary_code = tabela_final{row_idx, 4};
+
     fluxo_bin(i) = binary_code;
 end
 
-% Display the results
-disp('Flux of symbols:');
-disp(fluxo_simbolos);
-disp('Binary flux as a column vector of codewords:');
-disp(fluxo_bin);
+%%% Exercício 2.20 %%%-----------------------------------------------------
+
+n_fluxo_bin = sum(strlength(fluxo_bin));
 
 %%% Exercício 2.21 %%%-----------------------------------------------------
 
-R_cod_med = n_fluxo_bin / info.Duration;
-disp('Débito Binário Codificado Médio:');
-disp(R_cod_med);
+R_cod_med = n_fluxo_bin / audioinfo(audio_file).Duration;
 
 %%% Exercício 2.22 %%%-----------------------------------------------------
 
-% fluxo_simbolo_descod = zeros(length(fluxo_bin),1);
-% 
-% for i = 1:length(fluxo_bin)
-%     idx_table = find(fluxo_bin(i) == table2array(tabela_final(:,4)));
-%     fluxo_simbolo_descod(i) = simbs_amplitude(table2array(tabela_final(idx_table,1)));
-% end
-%2.23
+fluxo_simbolo_descod = zeros(length(fluxo_bin), 1);
+
+posicao = 1;
+
+for i = 1:length(fluxo_simbolo_descod)
+    for j = 1:size(tabela_final, 1)
+        codeword = tabela_final{j, 4};
+        code_length = length(codeword);
+        
+        if strcmp(fluxo_bin(posicao:posicao+code_length-1), codeword)
+            fluxo_simbolo_descod(i) = tabela_final{j, 1};
+            
+            posicao = posicao + code_length;
+            
+            break;
+        end
+    end
+end
+
+%%% Exercício 2.23 %%%-----------------------------------------------------
+
+figure;
 t = linspace(0,1,fs);
 plot(t,fluxo_simbolo_descod(1:fs));
 hold on
 plot(t,fluxo_simbolos(1:fs));
 grid on
-xlabel('t[s]');
-ylabel('amplitude');
+xlabel('Tempo [s]');
+ylabel('Amplitude');
 legend('fluxo simbolos descod','fluxo simbolos');
+
+%%%%%%%%%%%%%%%%%%%%%%-----------------------------------------------------
+clear audio_file binary_code code_length codeword dict i idx_max idx_min j posicao prob_simb_huff row_idx simb_huff sort_idx t total_symbols n
+save 100520_T1.mat
