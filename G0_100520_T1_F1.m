@@ -1,36 +1,21 @@
-clc;clear all;
+clear;
+clf;
+clc;
+%%% Exercício 2.6 %%%-----------------------------------------------------
 
-%2.6
-% hamming(7,4)
-n = 255;
+n = 255; 
 k = 247;
+r = n - k;
 
-P = zeros(k,n-k);
-I = eye(n-k);
-c = 1:1:n;
-m = zeros(k,1);
+non_power_of_2_indices = find(bitand(1:n, (1:n) - 1) ~= 0); % indices that are not powers of 2
+binary_m = dec2bin(non_power_of_2_indices, r); % convert indices to 8-bit binary strings
 
-aux1=1;
-for i=1:n
-    if log2(c(i)) - round(log2(c(i))) ~=0
-        m(aux1) = c(i);
-        aux1 = aux1 + 1;
-    end
-end
-m = dec2bin(m);
-%aux = parity_sum(c);
+P = flip(binary_m, 2) - '0'; % reverse binary string and convert to numeric array
+I = eye(r);
+H = [P; I];
 
-for i=1:k
-    aux = reverse(m(i,:));
-    %bin = decimalToBinaryVector(bin2dec(aux(i)));
-    for j=1:n-k    
-        P(i,j) = str2num(aux(j));
-    end
-end
+%%% Exercício 2.7 %%%-----------------------------------------------------
 
-H = vertcat(P,I);
-
-%2.7
 index_min_col_sum_zero = index_find_3(H,n,k);
 min_col_sum_zero =3;
 
